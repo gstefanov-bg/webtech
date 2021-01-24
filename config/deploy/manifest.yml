@@ -1,0 +1,64 @@
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: webtech
+  namespace: $NAMESPACE
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: webtech
+      release: webtech
+  template:
+    spec:
+      containers:
+        - name: webtech
+          image: "$DOCKER_REGISTRY/webtech:$DEPLOY_TAG"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webtech
+  namespace: $NAMESPACE
+spec:
+  type: NodePort
+  selector:
+    app: webtech
+    release: webtech
+    branch: $NAMESPACE
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+      protocol: TCP
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: $NAMESPACE-webtech-ingress
+  namespace: $NAMESPACE
+spec:
+  rules:
+    - host: webtech-$NAMESPACE.$DOMAIN
+      http:
+        paths:
+          - path:
+            backend:
+              serviceName: webtech
+              servicePort: http
+---

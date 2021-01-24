@@ -1,0 +1,88 @@
+#!groovy
+
+pipeline {
+  agent regus
+
+  environment {
+    CLUSTER_DOMAIN="${params.PLATFORM}.${params.DOMAIN.trim()}"
+    DOMAIN="${params.PLATFORM.equalsIgnoreCase('tdock') ? params.DOMAIN.trim() : env.CLUSTER_DOMAIN}"
+    REPO="${GIT_URL.tokenize('/.')[-2]}"
+    COMMIT="${GIT_COMMIT.substring(0, Math.min(GIT_COMMIT.length(), 6))}"
+    LOWERCASE_BRANCH="${GIT_BRANCH.toLowerCase().replaceAll('^[0-9]', '').replaceAll('[^a-z0-9]', '-').replaceAll('-+', '-').replaceAll('(^-+|-+$)', '').take(63)}"
+    NAMESPACE="${(params.NAMESPACE?.trim()) ?: env.LOWERCASE_BRANCH}"
+    DOCKER_REGISTRY="601303390846.dkr.ecr.us-east-1.amazonaws.com"
+    AWS_CREDENTIALS_ID="aws-credentials-devops"
+    DOCKER_CREDENTIALS_ID="ecr:us-east-1:${AWS_CREDENTIALS_ID}"
+    DOCKER_IMAGE_EXISTS=dockerImageExists(DOCKER_REGISTRY, AWS_CREDENTIALS_ID, REPO, COMMIT)
+    MEDULLA_SUBDIR="medulla@${env.BUILD_NUMBER}"
+  }
+
+  options {
+    buildDiscarder(logRotator(daysToKeepStr: '14'))
+  }
+
+  parameters {
+    string(defaultValue: 'main', description: 'WebTech Branch Name', name: 'BRANCH')
+    string(defaultValue: 'webtech-fmi.bg', description: 'Domain', name: 'DOMAIN')
+  }
+
+  stages {
+    stage('Build') {
+      steps {
+        withCredentials([string(credentialsId: 'ssh-key-base64', variable: 'JENKINS_SSH_KEY')]) {
+          script {
+            image = docker.build("${REPO}:${COMMIT}", "--build-arg SSH_KEY_VALUE=\"${JENKINS_SSH_KEY}\" -f Dockerfile .")
+          }
+        }
+      }
+    }
+
+    stage('Push') {
+      steps {
+        script {
+          // Lines below are to remove annoying Docker config defaults
+          sh 'rm ~/.dockercfg || true'
+          sh 'rm ~/.docker/config.json || true'
+          // End Docker config removal
+
+          docker.withRegistry("https://${DOCKER_REGISTRY}", DOCKER_CREDENTIALS_ID) {
+            image.push()
+          }
+        }
+      }
+    }
+
+    stage('Deploy') {
+      environment {
+        KUBECONFIG = "/home/jenkins/.kube/config"
+      }
+      stages {
+        stage('kubectl apply') {
+          steps {
+              sh "envsubst config/deploy/manifest.yml | kubectl apply -"
+            }
+          }
+        }
+      }
+      post {
+        always {
+          sh "chmod -R 777 ."
+          cleanWs disableDeferredWipeout: true
+          deleteDir()
+        }
+      }
+    }
+  }
+
+  post {
+    cleanup {
+      sh "chmod -R 777 ."
+      cleanWs disableDeferredWipeout: true
+      /* clean up our custom workspace */
+      deleteDir()
+      dir("${workspace}@tmp") {
+        deleteDir()
+      }
+    }
+  }
+}
