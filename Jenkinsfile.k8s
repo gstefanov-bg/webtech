@@ -1,7 +1,11 @@
 #!groovy
 
 pipeline {
-  agent regus
+  agent {
+    node {
+      label 'regus'
+    }
+  }
 
   environment {
     CLUSTER_DOMAIN="${params.PLATFORM}.${params.DOMAIN.trim()}"
