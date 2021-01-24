@@ -13,7 +13,7 @@ pipeline {
     REPO="${GIT_URL.tokenize('/.')[-2]}"
     COMMIT="${GIT_COMMIT.substring(0, Math.min(GIT_COMMIT.length(), 6))}"
     LOWERCASE_BRANCH="${GIT_BRANCH.toLowerCase().replaceAll('^[0-9]', '').replaceAll('[^a-z0-9]', '-').replaceAll('-+', '-').replaceAll('(^-+|-+$)', '').take(63)}"
-    NAMESPACE="${(params.NAMESPACE?.trim()) ?: env.LOWERCASE_BRANCH}"
+    NAMESPACE="${env.LOWERCASE_BRANCH}"
     DOCKER_REGISTRY="601303390846.dkr.ecr.us-east-1.amazonaws.com"
     AWS_CREDENTIALS_ID="aws-credentials-devops"
     DOCKER_CREDENTIALS_ID="ecr:us-east-1:${AWS_CREDENTIALS_ID}"
