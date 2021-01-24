@@ -9,7 +9,7 @@ pipeline {
 
   environment {
     CLUSTER_DOMAIN="${params.PLATFORM}.${params.DOMAIN.trim()}"
-    DOMAIN="${params.PLATFORM.equalsIgnoreCase('tdock') ? params.DOMAIN.trim() : env.CLUSTER_DOMAIN}"
+    DOMAIN="${params.DOMAIN.trim()}"
     REPO="${GIT_URL.tokenize('/.')[-2]}"
     COMMIT="${GIT_COMMIT.substring(0, Math.min(GIT_COMMIT.length(), 6))}"
     LOWERCASE_BRANCH="${GIT_BRANCH.toLowerCase().replaceAll('^[0-9]', '').replaceAll('[^a-z0-9]', '-').replaceAll('-+', '-').replaceAll('(^-+|-+$)', '').take(63)}"
