@@ -40,12 +40,7 @@ pipeline {
     stage('Push') {
       steps {
         script {
-          // Lines below are to remove annoying Docker config defaults
-          sh 'rm ~/.dockercfg || true'
-          sh 'rm ~/.docker/config.json || true'
-          // End Docker config removal
-
-          docker.withRegistry("https://${DOCKER_REGISTRY}", DOCKER_CREDENTIALS_ID) {
+          docker.withRegistry("https://${DOCKER_REGISTRY}", AWS_CREDENTIALS_ID) {
             image.push()
           }
         }
