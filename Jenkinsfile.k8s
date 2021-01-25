@@ -55,7 +55,7 @@ pipeline {
       stages {
         stage('kubectl apply') {
           steps {
-            sh "envsubst config/deploy/manifest.yml | kubectl apply -"
+            sh "envsubst config/deploy/manifest.yml | kubectl apply -f -"
           }
         }
       }
