@@ -55,8 +55,7 @@ pipeline {
       stages {
         stage('kubectl apply') {
           steps {
-            sh "echo 'envsubst config/deploy/manifest.yml | kubectl apply -'"
-            sh 'whoami'
+            sh "envsubst config/deploy/manifest.yml | kubectl apply -"
           }
         }
       }
