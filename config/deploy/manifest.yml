@@ -23,14 +23,8 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
-          resources:
-            requests:
-              cpu: 25m
-              memory: 64Mi
-            limits:
-              memory: 128Mi
         imagePullSecrets:
-          - name:  ecr
+          - name: ecr
 ---
 apiVersion: v1
 kind: Service
