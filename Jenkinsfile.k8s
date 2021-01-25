@@ -32,7 +32,7 @@ pipeline {
     stage('Build') {
       steps {
         script {
-          image = docker.build("${DOCKER_REGISTRY}/${REPO}:${COMMIT}", "-f Dockerfile .")
+          image = docker.build("${DOCKER_REGISTRY}/${REPO}:${NAMESPACE}-${COMMIT}", "-f Dockerfile .")
         }
       }
     }
@@ -55,7 +55,7 @@ pipeline {
       stages {
         stage('kubectl apply') {
           steps {
-            sh "echo 'envsubst config/deploy/manifest.yml | kubectl apply -'"
+            sh "envsubst config/deploy/manifest.yml | kubectl apply -"
           }
         }
       }

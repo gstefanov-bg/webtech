@@ -2,7 +2,7 @@
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: webtech
+  name: $REPO
   namespace: $NAMESPACE
 spec:
   replicas: 1
@@ -11,13 +11,13 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      app: webtech
-      release: webtech
+      app: $REPO
+      release: $REPO
   template:
     spec:
       containers:
-        - name: webtech
-          image: "$DOCKER_REGISTRY/webtech:$DEPLOY_TAG"
+        - name: $REPO
+          image: "$DOCKER_REGISTRY/$REPO:$NAMESPACE-$COMMIT"
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -29,17 +29,19 @@ spec:
               memory: 64Mi
             limits:
               memory: 128Mi
+        imagePullSecrets:
+          - name:  ecr
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: webtech
+  name: $REPO
   namespace: $NAMESPACE
 spec:
   type: NodePort
   selector:
-    app: webtech
-    release: webtech
+    app: $REPO
+    release: $REPO
     branch: $NAMESPACE
   ports:
     - name: http
@@ -50,15 +52,15 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: $NAMESPACE-webtech-ingress
+  name: $NAMESPACE-$REPO-ingress
   namespace: $NAMESPACE
 spec:
   rules:
-    - host: webtech-$NAMESPACE.$DOMAIN
+    - host: $REPO-$NAMESPACE.$DOMAIN
       http:
         paths:
           - path:
             backend:
-              serviceName: webtech
+              serviceName: $REPO
               servicePort: http
 ---
