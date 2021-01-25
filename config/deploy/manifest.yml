@@ -12,8 +12,10 @@ spec:
   selector:
     matchLabels:
       app: $REPO
-      release: $REPO
   template:
+    metadata:
+      labels:
+        app: $REPO
     spec:
       containers:
       - name: $REPO
