@@ -16,15 +16,15 @@ spec:
   template:
     spec:
       containers:
-        - name: $REPO
-          image: "$DOCKER_REGISTRY/$REPO:$NAMESPACE-$COMMIT"
-          imagePullPolicy: IfNotPresent
-          ports:
-            - name: http
-              containerPort: 80
-              protocol: TCP
-        imagePullSecrets:
-          - name: ecr
+      - name: $REPO
+        image: "$DOCKER_REGISTRY/$REPO:$NAMESPACE-$COMMIT"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+      imagePullSecrets:
+        - name: ecr
 ---
 apiVersion: v1
 kind: Service
