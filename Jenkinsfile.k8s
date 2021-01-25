@@ -14,7 +14,7 @@ pipeline {
     COMMIT="${GIT_COMMIT.substring(0, Math.min(GIT_COMMIT.length(), 6))}"
     LOWERCASE_BRANCH="${GIT_BRANCH.toLowerCase().replaceAll('^[0-9]', '').replaceAll('[^a-z0-9]', '-').replaceAll('-+', '-').replaceAll('(^-+|-+$)', '').take(63)}"
     NAMESPACE="${env.LOWERCASE_BRANCH}"
-    DOCKER_REGISTRY="public.ecr.aws/l3o9e9m9/webtech"
+    DOCKER_REGISTRY="public.ecr.aws/l3o9e9m9/"
     AWS_CREDENTIALS_ID="aws-credentials-devops"
     DOCKER_CREDENTIALS_ID="ecr:eu-central-1:${AWS_CREDENTIALS_ID}"
   }
@@ -32,7 +32,7 @@ pipeline {
     stage('Build') {
       steps {
         script {
-          image = docker.build("${REPO}:${COMMIT}", "-f Dockerfile .")
+          image = docker.build("${DOCKER_REGISTRY}/${REPO}:${COMMIT}", "-f Dockerfile .")
         }
       }
     }
