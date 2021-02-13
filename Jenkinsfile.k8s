@@ -3,7 +3,7 @@
 pipeline {
   agent {
     node {
-      label 'regus'
+      label 'k3s'
     }
   }
 
