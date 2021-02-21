@@ -25,7 +25,7 @@ pipeline {
 
   parameters {
     string(defaultValue: 'main', description: 'WebTech Branch Name', name: 'BRANCH')
-    string(defaultValue: 'webtech-fmi.bg', description: 'Domain', name: 'DOMAIN')
+    string(defaultValue: 'w3a.fmi.uni-sofia.bg', description: 'Domain', name: 'DOMAIN')
   }
 
   stages {
