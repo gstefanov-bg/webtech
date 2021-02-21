@@ -52,12 +52,8 @@ pipeline {
       environment {
         KUBECONFIG = "/home/jenkins/.kube/config"
       }
-      stages {
-        stage('kubectl apply') {
-          steps {
-            sh "cat config/deploy/manifest.yml | envsubst | kubectl apply -f -"
-          }
-        }
+      steps {
+        sh "cat config/deploy/manifest.yml | envsubst | kubectl apply -f -"
       }
       post {
         always {
@@ -65,18 +61,6 @@ pipeline {
           cleanWs disableDeferredWipeout: true
           deleteDir()
         }
-      }
-    }
-  }
-
-  post {
-    cleanup {
-      sh "chmod -R 777 ."
-      cleanWs disableDeferredWipeout: true
-      /* clean up our custom workspace */
-      deleteDir()
-      dir("${workspace}@tmp") {
-        deleteDir()
       }
     }
   }
