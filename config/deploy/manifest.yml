@@ -48,6 +48,9 @@ kind: Ingress
 metadata:
   name: $NAMESPACE-$REPO-ingress
   namespace: $NAMESPACE
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+    traefik.ingress.kubernetes.io/frontend-entry-points: http
 spec:
   rules:
     - host: $REPO-$NAMESPACE.$DOMAIN
