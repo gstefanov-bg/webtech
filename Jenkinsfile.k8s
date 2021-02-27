@@ -41,7 +41,7 @@ pipeline {
       steps {
         script {
           //sh "aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${DOCKER_REGISTRY}"
-          docker.withRegistry("https://${DOCKER_REGISTRY}") {
+          docker.withRegistry("http://${DOCKER_REGISTRY}") {
             image.push()
           }
         }
